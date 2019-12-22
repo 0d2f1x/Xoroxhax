@@ -10,6 +10,13 @@
 
 manager Memes;
 
+typedef struct Vector3_s
+{
+	float X;
+	float Z;
+	float Y;
+} Vector3_t;
+
 struct offsets
 {
 	unsigned int crosshairId = 0xB3D4;
@@ -37,7 +44,6 @@ struct variables
 	int streamDelay = 0;
 	static const int maxPlayers = 64;
 	int flashDuration = 0;
-	int bufer = 0;
 	string data = "";
 	const int procID = Memes.getProcess(Tools::obfuscated::obfProcess());
 	unsigned int gameModule = Memes.getModule(procID, Tools::obfuscated::obfClient());
@@ -46,20 +52,68 @@ struct variables
 	unsigned int localPlayer;
 	unsigned int UserInfoTable;
 	unsigned int entity;
-	int teamId;
-	float allXYZ[maxPlayers][2];
-	float currentXYZ[3];
 	int mapX;
-	int mapY;
+	int mapZ;
 	float mapScale; //5.86 (1.333 coefficient for primal map_scale)
 	string mapName;
 	string myName;
-	string name = "player"; //For json sending
-	string steamId;
-	int health;
-	bool dormant;
-	unsigned int C4;
 } var;
+
+typedef struct player_info_s
+{
+	char pad[0x10];
+	char name[128];
+	int	 userID;
+	char guid[33];
+	unsigned long friendsID;
+	char friendsName[128];
+	bool fakeplayer;
+	bool ishltv;
+	unsigned long customFiles[4];
+	unsigned char filesDownloaded;
+	byte buffer[200];
+} player_info_t;
+
+struct entityData_t
+{
+	char pad1[0xED];
+	bool m_bDormant;
+	char pad2[0x6];
+	int  m_iTeamNum;
+	char pad3[0x8];
+	int  m_iHealth;
+	int  m_fFlags;
+	Vector3_t m_vecViewOffset;
+	char pad4[0x24];
+	Vector3_t m_vecOrigin;
+	char pad5[0x11B];
+	bool m_bLifeState;
+	char pad6[0x6DD];
+	bool m_bSpotted;
+	char pad7[0x207E];
+	bool m_bShouldGlow;
+	char pad8[0x52F];
+	DWORD_PTR m_hActiveWeapon;
+	char pad9[0x9C];
+	int m_iItemDefinitionIndex;
+	char pad10[0x8C];
+	Vector3_t m_aimPunchAngle;
+	char pad11[0x1A4];
+	float m_flNextPrimaryAttack;
+	char pad12[0x244];
+	int m_nTickBase;
+	char pad13[0x480];
+	bool m_bIsDefusing;
+	char pad14[0x6A63];
+	float m_flFlashDuration;
+	char pad15[0x6E8];
+	int m_iClass;
+	char pad16[0x5C];
+	int m_iCrosshairId;
+};
+
+static entityData_t entityPlayer;
+static player_info_t playerInfo;
 
 struct MapInfo
 {
@@ -67,13 +121,13 @@ struct MapInfo
 	{
 		this->mapName = mapName;
 		this->offsetX = offsetX;
-		this->offsetY = offsetY;
+		this->offsetZ = offsetY;
 		this->scale = scale;//* 1.333; //768x768
 	}
 
 	string mapName;
 	int offsetX;
-	int offsetY;
+	int offsetZ;
 	float scale;
 };
 
@@ -92,14 +146,6 @@ map<int, MapInfo> maps =
 	{ 10, MapInfo(Tools::obfuscated::dz_sirocco(), -8604, 8804, 17.0f)  },
 };
 
-//static void GetPlayerName()
-//{
-//	unsigned int radarAddress = Memes.readMem<unsigned int>(offset.clientState + offset.radarBase);
-//	radarAddress = Memes.readMem<unsigned int>(radarAddress + 0x3C);
-//	cout << Memes.readMem<char>(radarAddress + (0x20 * (1 * 0x10)) + 0x3C);
-//}
-
-
 static void init()
 {
 	var.localPlayer = Memes.readMem<unsigned int>(var.gameModule + offset.localPlayer);
@@ -107,29 +153,11 @@ static void init()
 	var.mapName = Memes.readString(var.clientState + offset.clientStateMap);
 	var.UserInfoTable = Memes.readMem<unsigned int>(var.clientState + offset.playerInfo);
 
-
-	//struct radar_player_t {
-	//	vector<double> origin; //0x0000
-	//	vector<double> viewangles; //0x000C
-	//	char pad_0018[56]; //0x0018
-	//	uint32_t health; //0x0050
-	//	char name[32]; //0x0054
-	//	char pad_00D4[117]; //0x00D4
-	//	uint8_t visible; //0x00E9
-	//} radar; //Size: 0x0B32
-
-
-	//auto radar_base = Memes.readMem<DWORD>(var.gameModule + offset.radarBase);
-	//radar_base = Memes.readMem<DWORD>(radar_base + 0x78);
-	//auto radar_player = Memes.readMem<radar_player_t>(radar_base + (0x174 * (10 + 1)) - 0x3C);
-
-	//cout << radar.health;
-
 	for (auto& x : maps) {
 		if (x.second.mapName == var.mapName)
 		{
 			var.mapX = x.second.offsetX;
-			var.mapY = x.second.offsetY;
+			var.mapZ = x.second.offsetZ;
 			var.mapScale = x.second.scale;
 		}
 	}
