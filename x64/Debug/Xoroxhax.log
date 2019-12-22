@@ -1,0 +1,17 @@
+﻿  md5.cpp
+  main.cpp
+C:\Users\romal\source\repos\xor\xor\md5.cpp(115,36): warning C4267:  аргумент: преобразование из "size_t" в "MD5::size_type"; возможна потеря данных
+  manager.cpp
+C:\Users\romal\Desktop\Xoroxhax\Xoroxhax\vars.h(2,10): error C1083:  Не удается открыть файл включение: websocketpp/config/asio_no_tls_client.hpp: No such file or directory,
+C:\Users\romal\Desktop\Xoroxhax\Xoroxhax\manager.h(40,1): warning C4312:  приведение типов: преобразование из "unsigned int" в "BYTE **" большего размера
+C:\Users\romal\Desktop\Xoroxhax\Xoroxhax\manager.h(40,1): message :  Сообщение диагностики возникло в созданной компилятором функции "type manager::readMem(unsigned int)"
+C:\Users\romal\Desktop\Xoroxhax\Xoroxhax\manager.cpp(34,39): warning C4311:  приведение типов: усечение указателя из "HMODULE" в "unsigned int"
+C:\Users\romal\Desktop\Xoroxhax\Xoroxhax\manager.cpp(34,39): warning C4302:  приведение типов: усечение из "HMODULE" к "unsigned int"
+C:\Users\romal\Desktop\Xoroxhax\Xoroxhax\manager.cpp(42,40): warning C4312:  приведение типов: преобразование из "unsigned int" в "BYTE *" большего размера
+C:\Users\romal\Desktop\Xoroxhax\Xoroxhax\manager.h(23,1): warning C4312:  приведение типов: преобразование из "unsigned int" в "LPBYTE *" большего размера
+  Создание кода...
+C:\Users\romal\Desktop\Xoroxhax\Xoroxhax\manager.h(37): message :  выполняется компиляция ссылки на экземпляр шаблон функции "type manager::readMem<char>(unsigned int)"
+C:\Users\romal\Desktop\Xoroxhax\Xoroxhax\manager.h(37): message :         with
+C:\Users\romal\Desktop\Xoroxhax\Xoroxhax\manager.h(37): message :         [
+C:\Users\romal\Desktop\Xoroxhax\Xoroxhax\manager.h(37): message :             type=char
+C:\Users\romal\Desktop\Xoroxhax\Xoroxhax\manager.h(37): message :         ]
