@@ -10,55 +10,13 @@
 
 manager Memes;
 
+
 typedef struct Vector3_s
 {
 	float X;
 	float Z;
 	float Y;
 } Vector3_t;
-
-struct offsets
-{
-	unsigned int crosshairId = 0xB3D4;
-	unsigned int entityList = 0x4D3C68C;
-	unsigned int spotted = 0x93D;
-	unsigned int localPlayer = 0xD28B1C;
-	unsigned int flashDuration = 0xA410;
-	unsigned int vecOrigin = 0x138;
-	unsigned int vecVelocity = 0x114;
-	unsigned int iTeamNum = 0xF4;
-	unsigned int clientState = 0x588D9C;
-	unsigned int clientStateMap = 0x28C;
-	unsigned int isC4owner = 0x3A4290;
-	unsigned int health = 0x100;
-	unsigned int dormant = 0xED;
-	unsigned int accountID = 0x2FC8;
-	unsigned int radarBase = 0x51713EC; //for getting names
-	unsigned int playerInfo = 0x52B8;
-} offset;
-
-struct variables
-{
-	//string streamUrl = "ws://localhost";
-	string streamUrl = "wss://xorox.herokuapp.com";
-	int streamDelay = 0;
-	static const int maxPlayers = 64;
-	int flashDuration = 0;
-	string data = "";
-	const int procID = Memes.getProcess(Tools::obfuscated::obfProcess());
-	unsigned int gameModule = Memes.getModule(procID, Tools::obfuscated::obfClient());
-	unsigned int gameEngine = Memes.getModule(procID, Tools::obfuscated::obfEngine());
-	unsigned int clientState;
-	unsigned int localPlayer;
-	unsigned int UserInfoTable;
-	unsigned int entity;
-	int mapX;
-	int mapZ;
-	float mapScale; //5.86 (1.333 coefficient for primal map_scale)
-	string mapName;
-	string myName;
-} var;
-
 typedef struct player_info_s
 {
 	char pad[0x10];
@@ -73,7 +31,6 @@ typedef struct player_info_s
 	unsigned char filesDownloaded;
 	byte buffer[200];
 } player_info_t;
-
 struct entityData_t
 {
 	char pad1[0xED];
@@ -111,9 +68,54 @@ struct entityData_t
 	char pad16[0x5C];
 	int m_iCrosshairId;
 };
-
-static entityData_t entityPlayer;
+static entityData_t entityData;
 static player_info_t playerInfo;
+
+struct offsets
+{
+	unsigned int angEyeAnglesY = 0xB370;
+	unsigned int crosshairId = 0xB3D4;
+	unsigned int entityList = 0x4D3C68C;
+	unsigned int spotted = 0x93D;
+	unsigned int localPlayer = 0xD28B1C;
+	unsigned int flashDuration = 0xA410;
+	unsigned int vecOrigin = 0x138;
+	unsigned int vecVelocity = 0x114;
+	unsigned int iTeamNum = 0xF4;
+	unsigned int clientState = 0x588D9C;
+	unsigned int clientStateMap = 0x28C;
+	unsigned int isC4owner = 0x3A4290;
+	unsigned int health = 0x100;
+	unsigned int dormant = 0xED;
+	unsigned int accountID = 0x2FC8;
+	unsigned int radarBase = 0x51713EC; //for getting names
+	unsigned int playerInfo = 0x52B8;
+} offset;
+
+struct variables
+{
+	//string streamUrl = "ws://localhost";
+	string streamUrl = "wss://xorox.herokuapp.com";
+	int streamDelay = 0;
+	static const int maxPlayers = 64;
+	string data = "";
+	const int procID = Memes.getProcess(Tools::obfuscated::obfProcess());
+	unsigned int gameModule = Memes.getModule(procID, Tools::obfuscated::obfClient());
+	unsigned int gameEngine = Memes.getModule(procID, Tools::obfuscated::obfEngine());
+	unsigned int clientState;
+	unsigned int localPlayer;
+	unsigned int UserInfoTable;
+	int mapX;
+	int mapZ;
+	float mapScale; //5.86 (1.333 coefficient for primal map_scale)
+	string mapName;
+	string myName;
+	float viewAngle;
+	Vector3_t localPlayerOrigin;
+	//Vector3_t closestPlayerOrigin;
+} var;
+
+
 
 struct MapInfo
 {
@@ -144,14 +146,15 @@ map<int, MapInfo> maps =
 	{ 8,  MapInfo(Tools::obfuscated::cs_office(), -1838, 1858, 4.1f)    },
 	{ 9,  MapInfo(Tools::obfuscated::dz_blacksite(), -8604, 8804, 17.0f)},
 	{ 10, MapInfo(Tools::obfuscated::dz_sirocco(), -8604, 8804, 17.0f)  },
+	{ 11, MapInfo(Tools::obfuscated::dz_junglety(), -8504, 8741, 17.0f) }
 };
 
 static void init()
 {
-	var.localPlayer = Memes.readMem<unsigned int>(var.gameModule + offset.localPlayer);
-	var.clientState = Memes.readMem<unsigned int>(var.gameEngine + offset.clientState);
-	var.mapName = Memes.readString(var.clientState + offset.clientStateMap);
-	var.UserInfoTable = Memes.readMem<unsigned int>(var.clientState + offset.playerInfo);
+	var.localPlayer = Memes.RPM<unsigned int>(var.gameModule + offset.localPlayer);
+	var.clientState = Memes.RPM<unsigned int>(var.gameEngine + offset.clientState);
+	var.mapName = Memes.RS(var.clientState + offset.clientStateMap);
+	var.UserInfoTable = Memes.RPM<unsigned int>(var.clientState + offset.playerInfo);
 
 	for (auto& x : maps) {
 		if (x.second.mapName == var.mapName)

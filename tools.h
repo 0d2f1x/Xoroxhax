@@ -468,5 +468,32 @@ public:
 			dz_sirocco[10] = L'`' - 96;
 			return dz_sirocco;
 		}
+
+		static char* dz_junglety() {
+			char dz_junglety[22];
+			dz_junglety[19] = L'u' - 10;
+			dz_junglety[9] = L'w' - 3;
+			dz_junglety[20] = L'q' - 4;
+			dz_junglety[12] = L'v' - 2;
+			dz_junglety[7] = L'y' - 13;
+			dz_junglety[16] = L'u' - 8;
+			dz_junglety[10] = 66 + 55;
+			dz_junglety[0] = 100;
+			dz_junglety[5] = 117 - 7;
+			dz_junglety[17] = L'x' - 10;
+			dz_junglety[3] = L'U' + 21;
+			dz_junglety[18] = 105;
+			dz_junglety[2] = 95;
+			dz_junglety[8] = L'=' + 40;
+			dz_junglety[21] = 116;
+			dz_junglety[6] = 109 - 6;
+			dz_junglety[13] = 101;
+			dz_junglety[15] = L'Z' + 31;
+			dz_junglety[11] = 40 - 40;
+			dz_junglety[4] = L'u' - 0;
+			dz_junglety[14] = 55 + 44;
+			dz_junglety[1] = 122 - 0;
+			return dz_junglety;
+		}
 	};
 };

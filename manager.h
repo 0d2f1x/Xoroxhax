@@ -18,23 +18,23 @@ public:
 	~manager();
 
 	template <class type>
-	type readMem(unsigned int addr) {
+	type RPM(unsigned int addr) {
 		type x;
 		ReadProcessMemory(handle, (LPBYTE*)addr, &x, sizeof(x), NULL);
 		return x;
 	}
 
 	template <class type>
-	type writeMem(unsigned int addr, type x) {
+	type WPM(unsigned int addr, type x) {
 		WriteProcessMemory(handle, (LPBYTE*)addr, &x, sizeof(x), NULL);
 		return 0;
 	}
 
-	string readString(unsigned int addr)
+	string RS(unsigned int addr)
 	{
 		char string[256];
 		for (int i = 0; string[i - 1] > 0; i++)
-			string[i] = readMem<char>(addr + i);
+			string[i] = RPM<char>(addr + i);
 		return string;
 	}
 };
