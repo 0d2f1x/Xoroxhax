@@ -20,6 +20,7 @@ int main()
 	}
 	else
 	{
+		thread headWalker(Hex::headWalker);
 		thread trigger(Hex::trigger);
 		while (true)
 		{

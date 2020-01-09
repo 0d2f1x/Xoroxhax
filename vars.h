@@ -7,16 +7,36 @@
 #include "md5.h"
 #include "tools.h"
 #include "json.hpp"
+#define _USE_MATH_DEFINES
+#define RAD 180 / M_PI
+#include <math.h>
 
 manager Memes;
 
+static BYTE scan_code(DWORD pKey)
+{
+	const DWORD result = MapVirtualKey(pKey, MAPVK_VK_TO_VSC);
+	return static_cast<BYTE>(result);
+}
+
+static void press_key(DWORD pKey)
+{
+	keybd_event(static_cast<BYTE>(pKey), scan_code(pKey), 0, 0);
+}
+
+static void release_key(DWORD pKey)
+{
+	keybd_event(static_cast<BYTE>(pKey), scan_code(pKey), KEYEVENTF_KEYUP, 0);
+}
+#define PRESS(x) press_key(x)
+#define RELEASE(x) release_key(x)
 
 typedef struct Vector3_s
 {
 	float X;
-	float Z;
 	float Y;
-} Vector3_t;
+	float Z;
+} vector3;
 typedef struct player_info_s
 {
 	char pad[0x10];
@@ -40,9 +60,9 @@ struct entityData_t
 	char pad3[0x8];
 	int  m_iHealth;
 	int  m_fFlags;
-	Vector3_t m_vecViewOffset;
+	vector3 m_vecViewOffset;
 	char pad4[0x24];
-	Vector3_t m_vecOrigin;
+	vector3 m_vecOrigin;
 	char pad5[0x11B];
 	bool m_bLifeState;
 	char pad6[0x6DD];
@@ -54,7 +74,7 @@ struct entityData_t
 	char pad9[0x9C];
 	int m_iItemDefinitionIndex;
 	char pad10[0x8C];
-	Vector3_t m_aimPunchAngle;
+	vector3 m_aimPunchAngle;
 	char pad11[0x1A4];
 	float m_flNextPrimaryAttack;
 	char pad12[0x244];
@@ -73,6 +93,9 @@ static player_info_t playerInfo;
 
 struct offsets
 {
+	unsigned int dwForceForward = 0x316DDAC;
+	unsigned int m_vecViewOffset = 0x108;
+	unsigned int ViewAngles = 0x4D88;
 	unsigned int angEyeAnglesY = 0xB370;
 	unsigned int crosshairId = 0xB3D4;
 	unsigned int entityList = 0x4D3C68C;
@@ -106,16 +129,12 @@ struct variables
 	unsigned int localPlayer;
 	unsigned int UserInfoTable;
 	int mapX;
-	int mapZ;
+	int mapY;
 	float mapScale; //5.86 (1.333 coefficient for primal map_scale)
 	string mapName;
 	string myName;
 	float viewAngle;
-	Vector3_t localPlayerOrigin;
-	//Vector3_t closestPlayerOrigin;
 } var;
-
-
 
 struct MapInfo
 {
@@ -123,13 +142,13 @@ struct MapInfo
 	{
 		this->mapName = mapName;
 		this->offsetX = offsetX;
-		this->offsetZ = offsetY;
+		this->offsetY = offsetY;
 		this->scale = scale;//* 1.333; //768x768
 	}
 
 	string mapName;
 	int offsetX;
-	int offsetZ;
+	int offsetY;
 	float scale;
 };
 
@@ -160,8 +179,22 @@ static void init()
 		if (x.second.mapName == var.mapName)
 		{
 			var.mapX = x.second.offsetX;
-			var.mapZ = x.second.offsetZ;
+			var.mapY = x.second.offsetY;
 			var.mapScale = x.second.scale;
 		}
 	}
+}
+
+float Speed(vector3 velocity)
+{
+	return sqrt(velocity.X * velocity.X + velocity.Y * velocity.Y + velocity.Z * velocity.Z);
+}
+
+static float calcAngle(vector3 src, vector3 dst)
+{
+	vector3 resultVector = { (src.X - dst.X), (src.Y - dst.Y), (src.Z - dst.Z) };
+	float yaw = atan(resultVector.Y / resultVector.X) * RAD; // 1 RAD = 57.2958 DEGREE
+	if (resultVector.X >= 0.0f)
+		yaw += 180.0f;
+	return yaw;
 }
