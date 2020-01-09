@@ -6,7 +6,6 @@ nlohmann::json json;
 class Hex
 {
 public:
-
 	static string rad()
 	{
 		for (short i = 0; i < var.maxPlayers; i++) {
@@ -62,12 +61,10 @@ public:
 			}
 			if ((GetKeyState(VK_F3) & 0x100) != 0) //turn off forward when we ON or OFF
 				Memes.WPM<int>(var.gameModule + offset.dwForceForward, 0);
-			if ((GetKeyState(VK_F3) & 0x0001) != 0 && targetEntity != NULL) //main toggle
-			{ 
+			if ((GetKeyState(VK_F3) & 0x0001) != 0 && targetEntity != NULL) { //main toggle
 				vector3 localPlayerOrigin = Memes.RPM<vector3>(var.localPlayer + offset.vecOrigin);
 				vector3 targetPlayerOrigin = Memes.RPM<vector3>(targetEntity + offset.vecOrigin);
-				if (Speed(Memes.RPM<vector3>(targetEntity + offset.vecVelocity)) > 0)
-				{
+				if (Speed(Memes.RPM<vector3>(targetEntity + offset.vecVelocity)) > 0) {
 					Memes.WPM<float>(var.clientState + offset.ViewAngles + 0x4, calcAngle(localPlayerOrigin, targetPlayerOrigin));
 					Memes.WPM<int>(var.gameModule + offset.dwForceForward, 1);
 				}

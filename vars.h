@@ -13,23 +13,23 @@
 
 manager Memes;
 
-static BYTE scan_code(DWORD pKey)
-{
-	const DWORD result = MapVirtualKey(pKey, MAPVK_VK_TO_VSC);
-	return static_cast<BYTE>(result);
-}
-
-static void press_key(DWORD pKey)
-{
-	keybd_event(static_cast<BYTE>(pKey), scan_code(pKey), 0, 0);
-}
-
-static void release_key(DWORD pKey)
-{
-	keybd_event(static_cast<BYTE>(pKey), scan_code(pKey), KEYEVENTF_KEYUP, 0);
-}
-#define PRESS(x) press_key(x)
-#define RELEASE(x) release_key(x)
+//static BYTE scan_code(DWORD pKey)
+//{
+//	const DWORD result = MapVirtualKey(pKey, MAPVK_VK_TO_VSC);
+//	return static_cast<BYTE>(result);
+//}
+//
+//static void press_key(DWORD pKey)
+//{
+//	keybd_event(static_cast<BYTE>(pKey), scan_code(pKey), 0, 0);
+//}
+//
+//static void release_key(DWORD pKey)
+//{
+//	keybd_event(static_cast<BYTE>(pKey), scan_code(pKey), KEYEVENTF_KEYUP, 0);
+//}
+//#define PRESS(x) press_key(x)
+//#define RELEASE(x) release_key(x)
 
 typedef struct Vector3_s
 {
